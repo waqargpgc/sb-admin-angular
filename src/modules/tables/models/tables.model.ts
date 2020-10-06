@@ -3,5 +3,5 @@ export interface Country {
     id: number;
     body: string;
     title: string;
-    userId: number;
+    userId: any;
 }

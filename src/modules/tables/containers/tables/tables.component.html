@@ -1,8 +1,24 @@
-<sb-layout-dashboard
-    ><sb-dashboard-head title="Tables" [hideBreadcrumbs]="false"></sb-dashboard-head
-    ><sb-card
-        ><div class="card-body">The table below is adapted from ng-bootsrap. For more information, please visit the <a target="_blank" href="https://ng-bootstrap.github.io/#/components/table/overview">ng-bootstrap table documentation</a>.</div></sb-card
-    ><sb-card
-        ><div class="card-header"><fa-icon class="mr-1" [icon]='["fas", "table"]'></fa-icon>DataTable Example</div>
-        <div class="card-body"><sb-ng-bootstrap-table [pageSize]="6"></sb-ng-bootstrap-table></div></sb-card
-></sb-layout-dashboard>
+<sb-layout-dashboard>
+    <sb-dashboard-head title="Tables" [hideBreadcrumbs]="false"></sb-dashboard-head>
+    <sb-card>
+        <div class="card-body">The table below is adapted from ng-bootsrap. For more information, please visit the <a target="_blank" href="https://ng-bootstrap.github.io/#/components/table/overview">ng-bootstrap table documentation</a>.</div>
+    </sb-card>
+    <sb-card>
+        <div class="card-header">
+            <fa-icon class="mr-1" [icon]='["fas", "table"]'></fa-icon>DataTable Example</div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Searh By Year</label>
+                <select class="form-control" name="year" [(ngModel)]="year" id="year" (change)="countryService.searchByDate(year)">
+                  <option [value]="0">Select Year</option>
+                  <option [ngValue]="2019">2019</option>
+                  <option [ngValue]="2018">2018</option>
+                  <option [ngValue]="2017">2017</option>
+                  <option [ngValue]="2016">2016</option>
+                  <option [ngValue]="2015">2015</option>
+                </select>
+            </div>
+            <sb-ng-bootstrap-table [pageSize]="6"></sb-ng-bootstrap-table>
+        </div>
+    </sb-card>
+</sb-layout-dashboard>

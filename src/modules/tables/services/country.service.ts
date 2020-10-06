@@ -18,6 +18,8 @@ interface State {
     searchTerm: string;
     sortColumn: string;
     sortDirection: SortDirection;
+    start: Date;
+    end: Date;
 }
 
 function compare(v1: number | string, v2: number | string) {
@@ -43,27 +45,34 @@ function matches(country: Country, term: string, pipe: PipeTransform) {
     );
 }
 
+
 @Injectable({ providedIn: 'root' })
 export class CountryService {
     private _loading$ = new BehaviorSubject<boolean>(true);
     private _search$ = new Subject<void>();
+    private _searchto$ = new Subject<void>();
     private _countries$ = new BehaviorSubject<Country[]>([]);
     private _total$ = new BehaviorSubject<number>(0);
-    private COUNTRIES:any = [];
+    private COUNTRIES: any = [];
     private _state: State = {
         page: 1,
         pageSize: 4,
         searchTerm: '',
         sortColumn: '',
         sortDirection: '',
+        start: new Date(2001, 0, 1),
+        end: new Date()
     };
 
-    constructor(private pipe: DecimalPipe,private http:HttpClient) {
-       this.getHeroes().subscribe(data => {
-           let res:any = data;
-           this.COUNTRIES = res;
-        //this._countries$.next(res);
-        console.log(res);
+    constructor(private pipe: DecimalPipe, private http: HttpClient) {
+        this.getHeroes().subscribe(data => {
+            let res: any = data;
+            this.COUNTRIES = res;
+            this.COUNTRIES.forEach((element: any) => {
+                element.userId = this.randomDate().getFullYear();
+            });
+            //this._countries$.next(res);
+            console.log(res);
         });
 
         this._search$
@@ -83,9 +92,9 @@ export class CountryService {
     }
     getHeroes() {
         return this.http.get('https://jsonplaceholder.typicode.com/posts');
-      }
+    }
     get countries$() {
-       // return this.http.get('https://jsonplaceholder.typicode.com/posts');
+        // return this.http.get('https://jsonplaceholder.typicode.com/posts');
         return this._countries$.asObservable();
     }
     get total$() {
@@ -123,7 +132,10 @@ export class CountryService {
         Object.assign(this._state, patch);
         this._search$.next();
     }
-
+    randomDate() {
+        const { start, end } = this._state;
+        return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    }
     private _search(): Observable<SearchResult> {
         const { sortColumn, sortDirection, pageSize, page, searchTerm } = this._state;
 
@@ -137,5 +149,17 @@ export class CountryService {
         // 3. paginate
         countries = countries.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
         return of({ countries, total });
+    }
+    private searchByDate(value: any) {
+        const { sortColumn, sortDirection } = this._state;
+        // 1. sort
+        let countries = sort(this.COUNTRIES, sortColumn, sortDirection);
+        // 2. filter
+        if (value !== "0") {
+            countries = countries.filter(country => country.userId === value);
+        }
+        const total = countries.length;
+        this._countries$.next(countries);
+        this._total$.next(total);
     }
 }
